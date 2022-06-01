@@ -1,0 +1,53 @@
+server:
+  ssl:
+    enabled: true
+    key-store: localhost.p12
+    key-store-password: 5gIZ9sBP2n4NJ7Ft
+    key-store-type: PKCS12
+    key-alias: cevweb
+    protocol: TLS
+    enabled-protocols:
+    - TLSv1.2
+    - TLSv1.3
+    ciphers:
+    - TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384
+    - TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+    - TLS_ECDH_ECDSA_WITH_AES_256_GCM_SHA384
+    - TLS_ECDH_RSA_WITH_AES_256_GCM_SHA384
+  port: 1443
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/sendero_seguro
+    username: sendero
+    password: carde1pa
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      schema: sendero_seguro_schema
+      auto-commit: true
+      minimum-idle: 5
+      maximum-pool-size: 50
+  jpa:
+    show-sql: true
+  profiles:
+    active:
+    - local
+# Enable multipart uploads
+  servlet:
+    multipart:
+      enabled: true
+# Threshold after which files are written to disk.
+      file-size-threshold: 2KB
+# Max file size.
+      max-file-size: 100MB
+# Max Request Size
+      max-request-size: 10MB
+  session:
+    timeout: 60s
+#Thymeleaf
+  thymeleaf:
+    cache: false
+logging:
+  level:
+    '[org.springframework.web.servlet.mvc.method.annotation.HttpEntityMethodProcessor]': TRACE
+    '[org.springframework.web.servlet.mvc.method.annotation.RequestResponseBodyMethodProcessor]': TRACE
+    '[mx.edu.utn.senderoseguro.mapper]': TRACE

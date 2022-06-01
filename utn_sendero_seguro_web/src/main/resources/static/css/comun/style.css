@@ -1,0 +1,11 @@
+table.dataTable td {
+  font-size: 0.8em;
+}
+
+table.dataTable thead {
+  font-size: 0.8em;
+}
+
+div.dataTables_length, div.dataTables_filter, div.dataTables_info, div.dataTables_paginate {
+  font-size: 0.8em;
+}
