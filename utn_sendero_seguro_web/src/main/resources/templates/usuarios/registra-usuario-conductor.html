@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" xmlns:th="http://www.thymeleaf.org"
+	layout:decorate="~{layout/layout}">
+
+<body>
+	<main id="main" class="main" layout:fragment="main">
+		<div class="container">
+			<section class="section register min-vh-50 d-flex flex-column align-items-center justify-content-center py-4">
+				<div class="container">
+					<div class="row justify-content-center">
+						<div class="col-lg-6 col-md-6 d-flex flex-column align-items-center justify-content-center">
+							<!--<div class="d-flex justify-content-center py-4">
+								<a href="index.html" class="logo d-flex align-items-center w-auto">
+									<img src="assets/img/logo.png" alt="">
+									<span class="d-none d-lg-block">Sendero Seguro</span>
+								</a>
+							</div>--><!-- End Logo -->
+							<div class="card mb-3">
+								<div class="card-body">
+									<h5 class="card-title">Registro de usuario conductor</h5>
+									<p th:if="${param.success}">
+										<code th:text="${param.success}"></code>
+									</p>
+									<p th:if="${param.failure}">
+										<div class="invalid-feedback" th:text="${param.failure}"/>
+									</p>
+									<form class="row g-3 needs-validation" novalidate method="post" th:action="@{/usuario/registra-usuario-conductor}" th:object="${usuario}">
+										<div class="col-12">
+											<label for="nombres" class="form-label">Nombre</label>
+											<input type="text" class="form-control" id="nombres" th:field="*{nombres}" required autofocus>
+											<div class="invalid-feedback">Por favor, ingrese su nombre!</div>
+										</div>
+										<div class="col-12">
+											<label for="apellidos" class="form-label">Apellidos</label>
+											<input type="text" class="form-control" id="apellidos" th:field="*{apellidos}" required autofocus>
+											<div class="invalid-feedback">Por favor, ingrese sus apellidos!</div>
+										</div>
+										<div class="col-12">
+											<label for="correo" class="form-label">Correo</label>
+											<div class="input-group has-validation">
+												<span class="input-group-text" id="inputGroupPrepend">@</span>
+												<input type="email" class="form-control" id="correo" th:field="*{correo}" required autofocus>
+												<div class="invalid-feedback">Por favor, ingrese una dirección de correo valida!</div>
+											</div>
+										</div>
+										<div class="col-12">
+											<button class="btn btn-primary w-100" type="submit">Crear Cuenta</button>
+										</div>
+									</form>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+		</div>
+	</main>
+</body>
+
+</html>

@@ -1,6 +1,6 @@
-var tablaUsuarios = undefined;
+var tablaUsuariosWeb = undefined;
 $(document).ready(function() {
-	tablaUsuarios = $('#tablaAdministracionUsuarios').DataTable({
+	tablaUsuariosWeb = $('#tablaAdministracionUsuariosWeb').DataTable({
 		//dom: 'Bfrtip',
 		scrollY: "34vh",
 		//scrollX: true,
@@ -19,7 +19,7 @@ $(document).ready(function() {
 		pageLength: 25,
 		pagingType: "full_numbers",
 		ajax : {
-			url : _ctx + '/usuario/obtener-usuarios',
+			url : _ctx + '/usuario/obtener-usuarios-web',
 			type : 'POST',
 			dataType : 'json',
 			contentType : 'application/json',
@@ -31,45 +31,36 @@ $(document).ready(function() {
 			}
 		},
 		columns: [
-			{ data: "id", defaultContent: "<i>No establecido</i>", orderable: false },
-			{ data: "email", defaultContent: "<i>No establecido</i>" },
-			{ data: "firstName", defaultContent: "<i>No establecido</i>" },
-			{ data: "lastName", defaultContent: "<i>No establecido</i>" },
-			{ data: "idStatus", defaultContent: "<i>No establecido</i>", orderable: false,
+			{ data: "idUsuarioWeb", defaultContent: "<i>No establecido</i>", orderable: false },
+			{ data: "correo", defaultContent: "<i>No establecido</i>" },
+			{ data: "nombres", defaultContent: "<i>No establecido</i>" },
+			{ data: "apellidos", defaultContent: "<i>No establecido</i>" },
+			{ data: "rolWeb", "defaultContent": "<i>No establecido</i>" },
+			{ data: "idEstatus", defaultContent: "<i>No establecido</i>", orderable: false,
 				render: function (data, type, row) {
 					var strReturn = '';
-					if (row.idStatus == 1) {
+					if (row.idEstatus == 1) {
 						strReturn = `<span class="badge rounded-pill bg-success">Activo</span>`;
-					} else if (row.idStatus == 2) {
+					} else if (row.idEstatus == 2) {
 						strReturn = `<span class="badge rounded-pill bg-warning text-dark">Inactivo</span>`;
 					}
 					return strReturn;
 				}
 			}
-			//{ "data": "idTipoUsuario", "defaultContent": "<i>No establecido</i>" }
 		],
 		select: {
-			style: 'multi'
-		},
+			style: 'single'
+		}/*,
 		buttons: [
 			{
 				text: 'pageLength',
-				/*action: function () {
+				action: function () {
 					table.rows().select();
-				}*/
+				}
 			}
-		]
+		]*/
 	});
 
-	/*$('table tbody').on('click', 'tr', function() {
-		if ($(this).hasClass('selected')) {
-			$(this).removeClass('selected');
-		} else {
-			tablaUsuarios.$('tr.selected').removeClass('selected');
-			$(this).addClass('selected');
-		}
-	});*/
-	
 	$(".dataTables_filter input")
     	.unbind() // Unbind previous default bindings
     	.bind("keyup input", delay(function(e) { // Bind our desired behavior
@@ -85,44 +76,27 @@ $(document).ready(function() {
             	|| e.keyCode == 46  // delete
             	|| e.keyCode == 8  // delete
             )) {
-				tablaUsuarios.search(searchTerm).draw();
+				tablaUsuariosWeb.search(searchTerm).draw();
 			} else if(searchTerm === ""){
-				tablaUsuarios.search("").draw();
+				tablaUsuariosWeb.search("").draw();
 			}
         }, 500));
 });
 
-$("#btnSeleccionarTodos").click(function(e) {
+$("#btnActivarSeleccionado").click(function(e) {
 	e.preventDefault();
-	if (tablaUsuarios !== undefined) {
-		tablaUsuarios.rows().select();
-	}
-});
-
-$("#btnAnularSeleccion").click(function(e) {
-	e.preventDefault();
-	if (tablaUsuarios !== undefined) {
-		tablaUsuarios.rows().deselect();
-	}
-});
-
-$("#btnActivarSeleccionados").click(function(e) {
-	e.preventDefault();
-	if (tablaUsuarios !== undefined) {
-		var count = tablaUsuarios.rows( { selected: true } ).count();
-		if (count >= 1) {
+	if (tablaUsuariosWeb !== undefined) {
+		var count = tablaUsuariosWeb.rows( { selected: true } ).count();
+		if (count == 1) {
 			var json = {};
-			json.idUsuarios = [];
-			var data = tablaUsuarios.rows( { selected: true } ).data();
+			var data = tablaUsuariosWeb.rows( { selected: true } ).data();
 			for (let i = 0; i < count; i++) {
-				data["" + i + ""];
-				json.idUsuarios.push(data["" + i + ""].id);
+				json.idUsuarioWeb = data["" + i + ""].idUsuarioWeb;
 			}
-			asyncPost('/usuarios/activar-usuarios', json,
+			asyncPost('/usuario/activar-usuario-web', json,
 				function(respuesta) {
 					if (respuesta != null && respuesta != undefined && respuesta.codigo == 0) {
-						console.log("respuesta: " + JSON.stringify(respuesta));
-						tablaUsuarios.draw();
+						tablaUsuariosWeb.draw();
 					} else {
 						
 					}
@@ -136,23 +110,21 @@ $("#btnActivarSeleccionados").click(function(e) {
 	}
 });
 
-$("#btnInactivarSeleccionados").click(function(e) {
+$("#btnInactivarSeleccionado").click(function(e) {
 	e.preventDefault();
-	if (tablaUsuarios !== undefined) {
-		var count = tablaUsuarios.rows( { selected: true } ).count();
-		if (count >= 1) {
+	if (tablaUsuariosWeb !== undefined) {
+		var count = tablaUsuariosWeb.rows( { selected: true } ).count();
+		if (count == 1) {
 			var json = {};
-			json.idUsuarios = [];
-			var data = tablaUsuarios.rows( { selected: true } ).data();
+			var data = tablaUsuariosWeb.rows( { selected: true } ).data();
 			for (let i = 0; i < count; i++) {
-				data["" + i + ""];
-				json.idUsuarios.push(data["" + i + ""].id);
+				json.idUsuarioWeb = data["" + i + ""].idUsuarioWeb;
 			}
-			asyncPost('/usuarios/inactivar-usuarios', json,
+			asyncPost('/usuario/inactivar-usuario-web', json,
 				function(respuesta) {
 					if (respuesta != null && respuesta != undefined && respuesta.codigo == 0) {
 						console.log("respuesta: " + JSON.stringify(respuesta));
-						tablaUsuarios.draw();
+						tablaUsuariosWeb.draw();
 					} else {
 						
 					}

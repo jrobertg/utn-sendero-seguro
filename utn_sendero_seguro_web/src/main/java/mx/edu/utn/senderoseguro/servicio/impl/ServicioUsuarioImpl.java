@@ -1,10 +1,18 @@
 package mx.edu.utn.senderoseguro.servicio.impl;
 
+import static java.time.LocalDateTime.now;
+import static java.util.Objects.nonNull;
+import static mx.edu.utn.senderoseguro.entidad.CatalogoEstatusUsuario.ACTIVO;
+import static mx.edu.utn.senderoseguro.entidad.CatalogoEstatusUsuario.INACTIVO;
+import static mx.edu.utn.senderoseguro.entidad.CatalogoTipoUsuario.CONDUCTOR;
 import static mx.edu.utn.senderoseguro.web.controlador.dto.RespuestaBase.obtenerRespuestaBaseErronea;
 import static mx.edu.utn.senderoseguro.web.controlador.dto.RespuestaBase.obtenerRespuestaBaseExitosa;
 
+import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -14,16 +22,22 @@ import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import mx.edu.utn.senderoseguro.mapper.UserMapper;
-import mx.edu.utn.senderoseguro.modelo.Role;
-import mx.edu.utn.senderoseguro.modelo.User;
-import mx.edu.utn.senderoseguro.repositorio.RepositorioUsuario;
+import mx.edu.utn.senderoseguro.entidad.CatalogoRolWeb;
+import mx.edu.utn.senderoseguro.entidad.UsuarioMovil;
+import mx.edu.utn.senderoseguro.entidad.UsuarioWeb;
+import mx.edu.utn.senderoseguro.mapper.CatalogoRolWebMapper;
+import mx.edu.utn.senderoseguro.mapper.UsuarioMovilMapper;
+import mx.edu.utn.senderoseguro.mapper.UsuarioWebMapper;
 import mx.edu.utn.senderoseguro.servicio.ServicioUsuario;
 import mx.edu.utn.senderoseguro.web.controlador.dto.RespuestaBase;
-import mx.edu.utn.senderoseguro.web.controlador.dto.usuario.ModeloUsuario;
+import mx.edu.utn.senderoseguro.web.controlador.dto.Usuario;
+import mx.edu.utn.senderoseguro.web.controlador.dto.usuario.ModeloUsuarioMovil;
+import mx.edu.utn.senderoseguro.web.controlador.dto.usuario.ModeloUsuarioWeb;
 import mx.edu.utn.senderoseguro.web.controlador.dto.usuario.RegistroUsuarioDTO;
-import mx.edu.utn.senderoseguro.web.controlador.dto.usuario.SolicitudActivarUsuario;
-import mx.edu.utn.senderoseguro.web.controlador.dto.usuario.SolicitudInactivarUsuario;
+import mx.edu.utn.senderoseguro.web.controlador.dto.usuario.SolicitudActivarUsuarioWeb;
+import mx.edu.utn.senderoseguro.web.controlador.dto.usuario.SolicitudActivarUsuariosMovil;
+import mx.edu.utn.senderoseguro.web.controlador.dto.usuario.SolicitudInactivarUsuarioWeb;
+import mx.edu.utn.senderoseguro.web.controlador.dto.usuario.SolicitudInactivarUsuariosMovil;
 import mx.edu.utn.senderoseguro.web.datatables.BaseFilter;
 
 @Slf4j
@@ -31,46 +45,88 @@ import mx.edu.utn.senderoseguro.web.datatables.BaseFilter;
 @RequiredArgsConstructor
 public class ServicioUsuarioImpl implements ServicioUsuario {
 
-	private final UserMapper userMapper;
-	private final RepositorioUsuario userRepository;
+	private final UsuarioWebMapper usuarioWebMapper;
+	private final UsuarioMovilMapper usuarioMovilMapper;
+	private final CatalogoRolWebMapper catalogoRolWebMapper;
 
 	@Override
-	public User save(RegistroUsuarioDTO registrationDto) {
-		User user = new User()
-				.setIdStatus(2)
-				.setFirstName(registrationDto.getFirstName())
-				.setLastName(registrationDto.getLastName())
-				.setEmail(registrationDto.getEmail())
-				.setPassword(new BCryptPasswordEncoder().encode(registrationDto.getPassword()))
-				.setRoles(Arrays.asList(new Role("USER")));
-		return userRepository.save(user);
+	@Transactional
+	public RespuestaBase registraUsuarioWeb(RegistroUsuarioDTO registroUsuarioDTO) {
+		try {
+			Optional<UsuarioWeb> optional = usuarioWebMapper.obtenerPorCorreo(registroUsuarioDTO.getCorreo());
+			if (optional.isEmpty()) {
+				int registrosAlmacenados = usuarioWebMapper.insertSelective(new UsuarioWeb()
+						.setCorreo(registroUsuarioDTO.getCorreo())
+						.setContrasena(new BCryptPasswordEncoder().encode(registroUsuarioDTO.getContrasena()))
+						.setNombres(registroUsuarioDTO.getNombres())
+						.setApellidos(registroUsuarioDTO.getApellidos())
+						.setIdRolWeb(registroUsuarioDTO.getIdRolWeb())
+						.setIdEstatus(INACTIVO)
+						.setFechaCreacionBd(now())
+						.setFechaUltimoMovimiento(now()));
+				return obtenerRespuestaBaseExitosa(registrosAlmacenados + " registro(s) alamcenado(s).");
+			} else {
+				return obtenerRespuestaBaseErronea("El correo " + registroUsuarioDTO.getCorreo() + " ya existe.");
+			}
+		} catch (Exception e) {
+			log.error("Error al registrar el usuario." + e.getMessage(), e);
+			return obtenerRespuestaBaseErronea("Error al registrar el usuario.");
+		}
+	}
+	
+	@Override
+	@Transactional
+	public RespuestaBase registraUsuarioConductor(RegistroUsuarioDTO registroUsuarioDTO) {
+		try {
+			Optional<UsuarioMovil> optional = usuarioMovilMapper.obtenerPorCorreo(registroUsuarioDTO.getCorreo());
+			if (optional.isEmpty()) {
+				int registrosAlmacenados = usuarioMovilMapper.insertSelective(new UsuarioMovil()
+						.setCorreo(registroUsuarioDTO.getCorreo())
+						.setContrasena(new BCryptPasswordEncoder().encode(UUID.randomUUID().toString()))
+						.setNombres(registroUsuarioDTO.getNombres())
+						.setApellidos(registroUsuarioDTO.getApellidos())
+						.setIdTipoUsuario(CONDUCTOR)
+						.setIdEstatus(INACTIVO)
+						.setFechaCreacionBd(now())
+						.setFechaUltimoMovimiento(now()));
+				return obtenerRespuestaBaseExitosa(registrosAlmacenados + " registro(s) alamcenado(s).");
+			} else {
+				return obtenerRespuestaBaseErronea("El correo " + registroUsuarioDTO.getCorreo() + " ya existe.");
+			}
+		} catch (Exception e) {
+			log.error("Error al registrar el usuario." + e.getMessage(), e);
+			return obtenerRespuestaBaseErronea("Error al registrar el usuario.");
+		}
 	}
 
 	@Override
-	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-		User user = userRepository.findByEmailAndIdStatus(username, 1);
-		if (user == null) {
+	public UserDetails loadUserByUsername(String correo) throws UsernameNotFoundException {
+		Optional<UsuarioWeb> optional = usuarioWebMapper.obtenerPorCorreoYEstatus(correo, ACTIVO);
+		if (optional.isEmpty()) {
 			throw new UsernameNotFoundException("Invalid username or password.");
 		}
-		return new mx.edu.utn.senderoseguro.web.controlador.dto.Usuario(user);
-	}
-
-	@Override
-	public User obtenerUsuarioPorCorreo(String email) {
-		return userRepository.findByEmail(email);
+		UsuarioWeb usuarioWeb = optional.get();
+		return new Usuario(usuarioWeb, Arrays.asList(catalogoRolWebMapper.selectByPrimaryKey(usuarioWeb.getIdRolWeb()).get()));
 	}
 	
 	@Override
 	@Transactional(readOnly = true)
-	public List<ModeloUsuario> obtenerConsultaModeloUsuarios(BaseFilter filtros) {
-		return userMapper.obtenerConsultaModeloUsuarios(filtros);
+	public List<ModeloUsuarioWeb> obtenerModeloUsuariosWeb(BaseFilter filtros) {
+		return usuarioWebMapper.obtenerModeloUsuariosWeb(filtros);
+	}
+	
+	@Override
+	@Transactional(readOnly = true)
+	public List<ModeloUsuarioMovil> obtenerModeloUsuariosMovil(BaseFilter filtros) {
+		return usuarioMovilMapper.obtenerModeloUsuariosMovil(filtros);
 	}
 
 	@Override
 	@Transactional
-	public RespuestaBase activarUsuarios(SolicitudActivarUsuario solicitudActivarUsuario) {
+	public RespuestaBase activarUsuarioWeb(SolicitudActivarUsuarioWeb solicitudActivarUsuario) {
 		try {
-			int registrosActualizados = userMapper.activarUsuarios(solicitudActivarUsuario.getIdUsuarios());
+			int registrosActualizados = usuarioWebMapper.updateByPrimaryKeySelective(
+					new UsuarioWeb().setIdUsuarioWeb(solicitudActivarUsuario.getIdUsuarioWeb()).setIdEstatus(ACTIVO));
 			if (registrosActualizados == 0) {
 				return obtenerRespuestaBaseExitosa("Ningún registro activado.");
 			} else if (registrosActualizados == 1) {
@@ -86,9 +142,13 @@ public class ServicioUsuarioImpl implements ServicioUsuario {
 	
 	@Override
 	@Transactional
-	public RespuestaBase inactivarUsuarios(SolicitudInactivarUsuario solicitudInactivarUsuario) {
+	public RespuestaBase inactivarUsuarioWeb(SolicitudInactivarUsuarioWeb solicitudInactivarUsuario) {
 		try {
-			int registrosActualizados = userMapper.inactivarUsuarios(solicitudInactivarUsuario.getIdUsuarios());
+			if (solicitudInactivarUsuario.getIdUsuarioWeb().intValue() == 1) {
+				solicitudInactivarUsuario.setIdUsuarioWeb(0);
+			}
+			int registrosActualizados = usuarioWebMapper.updateByPrimaryKeySelective(
+					new UsuarioWeb().setIdUsuarioWeb(solicitudInactivarUsuario.getIdUsuarioWeb()).setIdEstatus(INACTIVO));
 			if (registrosActualizados == 0) {
 				return obtenerRespuestaBaseExitosa("Ningún registro inactivado.");
 			} else if (registrosActualizados == 1) {
@@ -100,6 +160,74 @@ public class ServicioUsuarioImpl implements ServicioUsuario {
 			log.error("Error al inactivar usuarios.", e);
 			return obtenerRespuestaBaseErronea("Error al inactivar usuarios, favor de contactar al administrador");
 		}
+	}
+
+	@Override
+	public RespuestaBase activarUsuariosMovil(SolicitudActivarUsuariosMovil solicitudActivarUsuariosMovil) {
+		int registrosActualizados = 0;
+		int registrosFallidos = 0;
+		if (nonNull(solicitudActivarUsuariosMovil) && nonNull(solicitudActivarUsuariosMovil.getIdUsuarios())) {
+			for (Integer idUsuario : solicitudActivarUsuariosMovil.getIdUsuarios()) {
+				try {
+					registrosActualizados += activarUsuarioMovil(idUsuario);
+				} catch(Exception e) {
+					log.error("Error al activar al usuario " + idUsuario, e);
+					registrosFallidos++;
+				}
+			}
+		}
+		RespuestaBase respuesta = obtenerRespuestaBaseExitosa("");
+		if (registrosFallidos > 0) {
+			respuesta.setMensaje("En la solicitud hubo " + registrosFallidos + " registro(s) fallido(s) y "
+				+ registrosActualizados + " registro(s) exitoso(s).");
+		} else {
+			respuesta.setMensaje("En la solicitud hubo " + registrosActualizados + " registro(s) exitoso(s).");
+		}
+		return respuesta;
+	}
+	
+	@Transactional
+	private int activarUsuarioMovil(Integer idUsuarioMovil) throws SQLException {
+		return usuarioMovilMapper.updateByPrimaryKeySelective(
+				new UsuarioMovil().setIdUsuarioMovil(idUsuarioMovil)
+				.setIdEstatus(ACTIVO).setFechaUltimoMovimiento(now()));
+	}
+
+	@Override
+	public RespuestaBase inactivarUsuariosMovil(SolicitudInactivarUsuariosMovil solicitudInactivarUsuariosMovil) {
+		int registrosActualizados = 0;
+		int registrosFallidos = 0;
+		if (nonNull(solicitudInactivarUsuariosMovil) && nonNull(solicitudInactivarUsuariosMovil.getIdUsuarios())) {
+			for (Integer idUsuario : solicitudInactivarUsuariosMovil.getIdUsuarios()) {
+				try {
+					registrosActualizados += inactivarUsuarioMovil(idUsuario);
+				} catch(Exception e) {
+					log.error("Error al inactivar al usuario " + idUsuario, e);
+					registrosFallidos++;
+				}
+			}
+		}
+		RespuestaBase respuesta = obtenerRespuestaBaseExitosa("");
+		if (registrosFallidos > 0) {
+			respuesta.setMensaje("En la solicitud hubo " + registrosFallidos + " registro(s) fallido(s) y "
+				+ registrosActualizados + " registro(s) exitoso(s).");
+		} else {
+			respuesta.setMensaje("En la solicitud hubo " + registrosActualizados + " registro(s) exitoso(s).");
+		}
+		return respuesta;
+	}
+	
+	@Transactional
+	private int inactivarUsuarioMovil(Integer idUsuarioMovil) throws SQLException {
+		return usuarioMovilMapper.updateByPrimaryKeySelective(
+				new UsuarioMovil().setIdUsuarioMovil(idUsuarioMovil)
+				.setIdEstatus(INACTIVO).setFechaUltimoMovimiento(now()));
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public List<CatalogoRolWeb> obtenerRolesWeb() {
+		return catalogoRolWebMapper.obtenerRolesWeb();
 	}
 
 }

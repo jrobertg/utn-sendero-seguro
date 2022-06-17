@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" xmlns:th="http://www.thymeleaf.org"
+	layout:decorate="~{layout/layout}">
+
+<body>
+	<main id="main" class="main" layout:fragment="main">
+		<div class="pagetitle">
+			<h1>Administración de usuarios web</h1>
+			<nav>
+				<ol class="breadcrumb">
+					<li class="breadcrumb-item"><a href="/">Inicio</a></li>
+					<li class="breadcrumb-item">Administración</li>
+					<li class="breadcrumb-item active">Usuarios Web</li>
+				</ol>
+			</nav>
+			<section class="section">
+				<div class="row">
+					<div class="col-lg-12">
+						<div class="card">
+							<div class="card-body">
+								<!--<h5 class="card-title">Datatables</h5>-->
+								<p>Puede realizar busquedas, activar e inactivar usuarios.</p>
+								<button type="button" class="btn btn-outline-success" id="btnActivarSeleccionado">Activar usuario seleccionado</button>
+								<button type="button" class="btn btn-outline-success" id="btnInactivarSeleccionado">Inactivar usuario seleccionado</button>
+								</p>
+								<table id="tablaAdministracionUsuariosWeb" class="display nowrap compact">
+									<thead>
+										<tr>
+											<th>Id usuario</th>
+											<th>Correo</th>
+											<th>Nombre(s)</th>
+											<th>Apellido(s)</th>
+											<th>Rol web</th>
+											<th>Estatus</th>
+										</tr>
+									</thead>
+									<tbody></tbody>
+								</table>
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+		</div><!-- End Page Title -->
+	</main>
+</body>
+
+</html>

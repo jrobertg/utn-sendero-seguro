@@ -95,8 +95,13 @@
 			</a>
 			<ul id="administracion-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
 				<li>
-					<a href="administrar-usuarios">
-						<i class="bi bi-circle"></i><span>usuarios</span>
+					<a href="/usuario/administrar-usuarios-web">
+						<i class="bi bi-circle"></i><span>Usuarios web</span>
+					</a>
+				</li>
+				<li>
+					<a href="/usuario/administrar-usuarios-movil">
+						<i class="bi bi-circle"></i><span>Usuarios de app móvil</span>
 					</a>
 				</li>
 				<!--<li>
@@ -213,11 +218,22 @@
 		</li>--><!-- End Contact Page Nav -->
 
 		<li class="nav-item">
-			<a class="nav-link collapsed" href="registro">
-				<i class="bi bi-card-list"></i>
-				<span>Registrar Usuario</span>
+			<a class="nav-link collapsed" data-bs-target="#registro-usuarios-nav" data-bs-toggle="collapse" href="#">
+				<i class="bi bi-journal-text"></i><span>Registrar Usuario</span><i class="bi bi-chevron-down ms-auto"></i>
 			</a>
-		</li><!-- End Register Page Nav -->
+			<ul id="registro-usuarios-nav" class="nav-content collapse" data-bs-parent="#sidebar-nav">
+				<li>
+					<a href="/usuario/registra-usuario-web">
+						<i class="bi bi-circle"></i><span>Registra usuario de portal web</span>
+					</a>
+				</li>
+				<li>
+					<a href="/usuario/registra-usuario-conductor">
+						<i class="bi bi-circle"></i><span>Registra conductor</span>
+					</a>
+				</li>
+			</ul>
+		</li><!-- Fin Registrar Usuario Nav -->
 
 		<!--<li class="nav-item">
 			<a class="nav-link collapsed" href="pages-login.html">

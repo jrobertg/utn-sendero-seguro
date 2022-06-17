@@ -4,24 +4,35 @@ import java.util.List;
 
 import org.springframework.security.core.userdetails.UserDetailsService;
 
-import mx.edu.utn.senderoseguro.modelo.User;
+import mx.edu.utn.senderoseguro.entidad.CatalogoRolWeb;
 import mx.edu.utn.senderoseguro.web.controlador.dto.RespuestaBase;
-import mx.edu.utn.senderoseguro.web.controlador.dto.usuario.ModeloUsuario;
+import mx.edu.utn.senderoseguro.web.controlador.dto.usuario.ModeloUsuarioMovil;
+import mx.edu.utn.senderoseguro.web.controlador.dto.usuario.ModeloUsuarioWeb;
 import mx.edu.utn.senderoseguro.web.controlador.dto.usuario.RegistroUsuarioDTO;
-import mx.edu.utn.senderoseguro.web.controlador.dto.usuario.SolicitudActivarUsuario;
-import mx.edu.utn.senderoseguro.web.controlador.dto.usuario.SolicitudInactivarUsuario;
+import mx.edu.utn.senderoseguro.web.controlador.dto.usuario.SolicitudActivarUsuarioWeb;
+import mx.edu.utn.senderoseguro.web.controlador.dto.usuario.SolicitudActivarUsuariosMovil;
+import mx.edu.utn.senderoseguro.web.controlador.dto.usuario.SolicitudInactivarUsuarioWeb;
+import mx.edu.utn.senderoseguro.web.controlador.dto.usuario.SolicitudInactivarUsuariosMovil;
 import mx.edu.utn.senderoseguro.web.datatables.BaseFilter;
 
 public interface ServicioUsuario extends UserDetailsService {
 
-	User save(RegistroUsuarioDTO registrationDto);
+	RespuestaBase registraUsuarioWeb(RegistroUsuarioDTO registroUsuarioDTO);
 	
-	User obtenerUsuarioPorCorreo(String email);
+	RespuestaBase registraUsuarioConductor(RegistroUsuarioDTO registroUsuarioDTO);
 	
-	List<ModeloUsuario> obtenerConsultaModeloUsuarios(BaseFilter filtros);
+	List<ModeloUsuarioWeb> obtenerModeloUsuariosWeb(BaseFilter filtros);
 	
-	RespuestaBase activarUsuarios(SolicitudActivarUsuario solicitudActivarUsuario);
+	List<ModeloUsuarioMovil> obtenerModeloUsuariosMovil(BaseFilter filtros);
 	
-	RespuestaBase inactivarUsuarios(SolicitudInactivarUsuario solicitudInactivarUsuario);
+	RespuestaBase activarUsuariosMovil(SolicitudActivarUsuariosMovil solicitudActivarUsuariosMovil);
+	
+	RespuestaBase activarUsuarioWeb(SolicitudActivarUsuarioWeb solicitudActivarUsuario);
+	
+	RespuestaBase inactivarUsuariosMovil(SolicitudInactivarUsuariosMovil solicitudInactivarUsuariosMovil);
+	
+	RespuestaBase inactivarUsuarioWeb(SolicitudInactivarUsuarioWeb solicitudInactivarUsuario);
+	
+	List<CatalogoRolWeb> obtenerRolesWeb();
 
 }

@@ -8,9 +8,9 @@ import mx.edu.utn.senderoseguro.web.controlador.dto.SolicitudBase;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class SolicitudInactivarUsuario extends SolicitudBase {
-	
-private static final long serialVersionUID = 1L;
+public class SolicitudActivarUsuariosMovil extends SolicitudBase {
+
+	private static final long serialVersionUID = 1L;
 	
 	private List<Integer> idUsuarios;
 

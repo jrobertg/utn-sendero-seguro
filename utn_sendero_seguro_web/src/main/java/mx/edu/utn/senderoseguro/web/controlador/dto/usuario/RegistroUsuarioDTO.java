@@ -5,9 +5,10 @@ import lombok.Data;
 @Data
 public class RegistroUsuarioDTO {
 	
-	private String firstName;
-	private String lastName;
-	private String email;
-	private String password;
+	private String nombres;
+	private String apellidos;
+	private String correo;
+	private String contrasena;
+	private Integer idRolWeb;
 	
 }

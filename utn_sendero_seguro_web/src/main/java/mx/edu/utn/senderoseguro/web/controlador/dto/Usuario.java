@@ -1,6 +1,7 @@
 package mx.edu.utn.senderoseguro.web.controlador.dto;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.security.core.GrantedAuthority;
@@ -9,6 +10,8 @@ import org.springframework.security.core.userdetails.User;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import mx.edu.utn.senderoseguro.entidad.CatalogoRolWeb;
+import mx.edu.utn.senderoseguro.entidad.UsuarioWeb;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -16,18 +19,18 @@ public class Usuario extends User {
 
 	private static final long serialVersionUID = 1L;
 	
-	private Long idUsuario;
+	private Integer idUsuario;
 
 	private String firstName;
 
 	private String lastName;
 
-	public Usuario(mx.edu.utn.senderoseguro.modelo.User user) {
-		this(user.getEmail(), user.getPassword(), user.getRoles().stream()
-				.map(role -> new SimpleGrantedAuthority(role.getName())).collect(Collectors.toList()));
-		setIdUsuario(user.getId());
-		setFirstName(user.getFirstName());
-		setLastName(user.getLastName());
+	public Usuario(UsuarioWeb usuarioWeb, List<CatalogoRolWeb> roles) {
+		this(usuarioWeb.getCorreo(), usuarioWeb.getContrasena(), roles.stream()
+				.map(role -> new SimpleGrantedAuthority(role.getRolWeb())).collect(Collectors.toList()));
+		setIdUsuario(usuarioWeb.getIdUsuarioWeb());
+		setFirstName(usuarioWeb.getNombres());
+		setLastName(usuarioWeb.getApellidos());
 	}
 
 	public Usuario(String username, String password, Collection<? extends GrantedAuthority> authorities) {
