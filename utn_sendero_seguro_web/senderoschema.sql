@@ -1,3 +1,4 @@
+#Creación de tabla sendero_seguro_schema.catalogo_tipo_usuario
 CREATE TABLE sendero_seguro_schema.catalogo_tipo_usuario
 (
     id_tipo_usuario serial NOT NULL,
